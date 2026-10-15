@@ -184,7 +184,10 @@
     root.dataset.dark = effectiveTheme() === 'dark' ? '1' : '0';
   }
   document.getElementById('btn-theme').onclick = (e) => {
-    update({ theme: effectiveTheme() === 'dark' ? 'light' : 'dark' });
+    const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+    const system = darkMq.matches ? 'dark' : 'light';
+    // Choosing the same theme as the phone clears the override, so it follows the phone again.
+    update({ theme: next === system ? null : next });
     applyTheme();
     gsap.fromTo(e.currentTarget.querySelectorAll('svg'), { rotation: -90, scale: 0.4 }, { rotation: 0, scale: 1, duration: 0.6, ease: 'back.out(2)' });
   };
