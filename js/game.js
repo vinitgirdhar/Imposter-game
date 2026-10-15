@@ -67,7 +67,7 @@
   const isImposter = (round, i) => round.imposters.includes(i);
   const wordFor = (round, i) => (isImposter(round, i) ? round.imposterWord : round.crewWord);
 
-  const cleanName = (name) => String(name ?? '').replace(/\s+/g, ' ').trim();
+  const cleanName = (name) => String(name == null ? '' : name).replace(/\s+/g, ' ').trim();
 
   /** Returns an error message, or '' if the name is fine. */
   function validateName(name, taken) {

@@ -182,6 +182,9 @@
     const root = document.documentElement;
     if (state.theme) root.dataset.theme = state.theme; else delete root.dataset.theme;
     root.dataset.dark = effectiveTheme() === 'dark' ? '1' : '0';
+    // Tint the browser bars / iOS status area to the page colour.
+    const meta = document.getElementById('theme-color');
+    if (meta) meta.setAttribute('content', effectiveTheme() === 'dark' ? '#000000' : '#f5f5f7');
   }
   document.getElementById('btn-theme').onclick = (e) => {
     const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
@@ -191,7 +194,7 @@
     applyTheme();
     gsap.fromTo(e.currentTarget.querySelectorAll('svg'), { rotation: -90, scale: 0.4 }, { rotation: 0, scale: 1, duration: 0.6, ease: 'back.out(2)' });
   };
-  darkMq.addEventListener('change', applyTheme);
+  window.FX.onMediaChange(darkMq, applyTheme);
 
   /* ---------- Back button guard ---------- */
   // Browser "back" must never step into an earlier player's word, so we trap it.
@@ -208,5 +211,15 @@
   applyTheme();
   bindPress(document.body);
   ambient();
-  render();
+  render().catch(showCrash);
+
+  // Never leave players staring at a blank page: show a way out instead.
+  function showCrash(err) {
+    stage.style.pointerEvents = '';
+    stage.innerHTML = `<section class="screen"><div class="screen-body center">
+      <h1 class="title">Something went wrong</h1>
+      <p class="lead">Your browser had trouble loading the game. Try reloading, or open it in Chrome or Safari.</p>
+      <button class="btn btn-primary" onclick="location.reload()">Reload</button></div></section>`;
+    if (window.console) console.error(err);
+  }
 })();

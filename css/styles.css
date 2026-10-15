@@ -92,7 +92,10 @@
 
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; }
+/* Paint the page colour on <html> too, so no strip of plain colour shows under the
+   iPhone home indicator or status bar in home-screen (standalone) mode. */
+html { margin: 0; height: 100%; min-height: 100vh; background: var(--bg); }
+body { margin: 0; height: 100%; min-height: 100vh; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -109,7 +112,14 @@ input { font: inherit; color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---------- Ambient background ---------- */
-.bg { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.bg {
+  position: fixed; left: 0; right: 0; z-index: 0;
+  /* Extend past the safe areas: iOS standalone can size fixed boxes short of the screen. */
+  top: calc(-1 * env(safe-area-inset-top, 0px));
+  height: calc(100vh + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px) + 60px);
+  height: calc(100lvh + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px) + 60px);
+  overflow: hidden; pointer-events: none;
+}
 .blob { position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%; will-change: transform; }
 .blob-a { background: radial-gradient(circle, var(--blob-a), transparent 62%); top: -30vmax; left: -25vmax; }
 .blob-b { background: radial-gradient(circle, var(--blob-b), transparent 62%); bottom: -35vmax; right: -30vmax; }
@@ -118,6 +128,9 @@ input { font: inherit; color: inherit; }
 /* ---------- Shell ---------- */
 .app {
   position: relative; z-index: 1;
+  /* 100% works everywhere; dvh (iOS 15.4+, Chrome 108+) tracks the moving toolbar.
+     Without the fallback, older browsers and in-app webviews got height 0 = blank screen. */
+  height: 100%;
   height: 100dvh;
   max-width: 480px; margin: 0 auto;
   display: flex; flex-direction: column;
@@ -138,7 +151,7 @@ input { font: inherit; color: inherit; }
 
 .stage { position: relative; flex: 1; min-height: 0; }
 .screen {
-  position: absolute; inset: 0;
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
   display: flex; flex-direction: column;
   padding-bottom: max(20px, env(safe-area-inset-bottom));
 }
@@ -174,7 +187,7 @@ input { font: inherit; color: inherit; }
 }
 .btn-primary { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow-btn); }
 .btn-primary::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-radius: inherit;
   background: linear-gradient(180deg, rgba(255,255,255,0.18), transparent 55%);
   pointer-events: none;
 }
@@ -224,7 +237,7 @@ input { font: inherit; color: inherit; }
   font-size: 40px; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums;
   text-align: center; line-height: 52px;
 }
-.counter span { position: absolute; inset: 0; }
+.counter span { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
 .avatars { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 18px; min-height: 28px; }
 .avatar-dot {
   width: 28px; height: 28px; border-radius: 50%;
@@ -263,10 +276,10 @@ input { font: inherit; color: inherit; }
 .privacy-note svg { flex-shrink: 0; color: var(--accent); }
 
 /* ---------- Secret card ---------- */
-.flip { perspective: 1400px; width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 3 / 4; max-height: 52dvh; }
+.flip { perspective: 1400px; width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 3 / 4; max-height: 52vh; max-height: 52dvh; }
 .flip-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; will-change: transform; }
 .face {
-  position: absolute; inset: 0;
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
   border-radius: 32px;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -280,7 +293,7 @@ input { font: inherit; color: inherit; }
   box-shadow: 0 30px 60px rgba(88, 86, 214, 0.35);
 }
 .face-back::before {
-  content: ""; position: absolute; inset: 14px; border-radius: 22px;
+  content: ""; position: absolute; top: 14px; right: 14px; bottom: 14px; left: 14px; border-radius: 22px;
   border: 1.5px solid rgba(255,255,255,0.25);
 }
 .face-back .q { font-size: 96px; font-weight: 800; line-height: 1; opacity: 0.95; letter-spacing: -0.04em; }
@@ -298,14 +311,14 @@ input { font: inherit; color: inherit; }
 }
 .face-front .lead { margin-top: 18px; font-size: 15px; }
 .shine {
-  position: absolute; inset: -50%; pointer-events: none;
+  position: absolute; top: -50%; right: -50%; bottom: -50%; left: -50%; pointer-events: none;
   background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
   transform: translateX(-60%);
 }
 
 /* ---------- Handoff ---------- */
 .pass-visual { position: relative; width: 140px; height: 140px; margin: 0 auto; }
-.pass-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; }
+.pass-ring { position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; }
 .pass-phone {
   position: absolute; left: 50%; top: 50%; width: 56px; height: 96px; margin: -48px 0 0 -28px;
   border-radius: 14px; background: linear-gradient(160deg, var(--accent), var(--accent-2));
@@ -376,7 +389,7 @@ input { font: inherit; color: inherit; }
 }
 .imp-card .face { border-radius: 24px; padding: 14px; }
 .imp-card .face-back .q { font-size: 56px; }
-.imp-card .face-back::before { inset: 8px; border-radius: 18px; }
+.imp-card .face-back::before { top: 8px; right: 8px; bottom: 8px; left: 8px; border-radius: 18px; }
 .imp-card .face-front { gap: 8px; }
 .imp-card .avatar {
   width: 52px; height: 52px; border-radius: 50%;
@@ -400,7 +413,7 @@ input { font: inherit; color: inherit; }
 .skip-hint { text-align: center; font-size: 13px; color: var(--text-3); }
 
 /* ---------- Sheet / toast / fx ---------- */
-.sheet-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); }
+.sheet-backdrop { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(0,0,0,0.4); }
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 51;
   width: min(480px, 100%); margin: 0 auto;
@@ -419,7 +432,7 @@ input { font: inherit; color: inherit; }
   background: var(--text); color: var(--bg);
   font-size: 14px; font-weight: 600; white-space: nowrap;
 }
-.fx-layer { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+.fx-layer { position: fixed; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; z-index: 40; overflow: hidden; }
 .confetti { position: absolute; top: -20px; width: 9px; height: 14px; border-radius: 2px; }
 
 @media (min-height: 760px) {

@@ -2,6 +2,11 @@
 (function () {
   const gsap = window.gsap;
   const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  /** MediaQueryList.addEventListener is Safari 14+; older iOS only has addListener. */
+  function onMediaChange(list, fn) {
+    if (list.addEventListener) list.addEventListener('change', fn);
+    else if (list.addListener) list.addListener(fn);
+  }
   const reduced = () => mq.matches;
 
   const $$ = (root, sel) => Array.from(root.querySelectorAll(sel));
@@ -129,5 +134,5 @@
       .to(el, { autoAlpha: 0, y: -20, duration: 0.3, ease: 'power2.in' }, '+=1.8');
   }
 
-  window.FX = { reduced, haptic, splitText, escapeHtml, enter, leave, bindPress, rollCounter, shake, pop, ambient, confetti, toast };
+  window.FX = { onMediaChange, reduced, haptic, splitText, escapeHtml, enter, leave, bindPress, rollCounter, shake, pop, ambient, confetti, toast };
 })();

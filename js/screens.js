@@ -299,7 +299,7 @@
       html: `<section class="screen">
         <div class="screen-body center">
           <div data-anim style="position:relative;width:240px;height:240px;margin:0 auto">
-            <div data-orbit style="position:absolute;inset:0">${dots}</div>
+            <div data-orbit style="position:absolute;top:0;right:0;bottom:0;left:0">${dots}</div>
             <img src="icon.svg" alt="" style="position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px;border-radius:26px;box-shadow:var(--shadow-btn)">
           </div>
           <h1 class="title" data-split>Everyone Has Their Word!</h1>
