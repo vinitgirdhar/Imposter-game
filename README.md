@@ -1,4 +1,4 @@
-# Imposter 🕵️
+# Imposter 
 
 **A party game for one phone and a group of friends.**
 
